@@ -118,3 +118,10 @@ Raw notes on how AI (Claude Code) was used while building this. Feeds `AI_WORKFL
 - Outcome: Sahil had them removed.
 - Why: keep the stack minimal and versions pinned. The Neon CLI works without them.
 - Verified by: `grep "@neon/"` finds nothing in `package.json` or the lockfile; typecheck, lint, and 61 tests pass.
+
+### 2026-11-10 01:59 - API QA against the live Vercel URL
+- Context: first production deploy at https://ajaia-tawny-alpha.vercel.app/.
+- AI proposed: rerun the same curl QA script used locally, now against production.
+- Outcome: kept. All checks matched the spec on production: session signing, content round-trip, viewer 403, editor edit 200 and delete/share 403, stranger 404 (API and page), tampered cookie 401, share validation messages, role upgrade, revoke, md import and file errors. Test documents were deleted afterwards.
+- Also noted: the signed-out dashboard redirect arrives inside a streamed 200 response (a client redirect plus a meta refresh) rather than an HTTP 307, because `loading.tsx` starts streaming first. It still lands on `/login` in a browser and sends no dashboard data.
+- Verified by: script output. Browser-only behavior (toolbar active states, autosave status, dialog focus, beforeunload) still needs Sahil's manual pass.

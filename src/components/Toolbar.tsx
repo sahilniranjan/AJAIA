@@ -18,6 +18,9 @@ function ToolbarButton({ label, shortcut, active, onClick, children }: ToolbarBu
       aria-label={label}
       aria-pressed={active}
       title={`${label} (${shortcut})`}
+      // Keep focus and the selection in the editor; otherwise the button holds focus until
+      // Tiptap's focus() runs on the next animation frame.
+      onMouseDown={(event) => event.preventDefault()}
       onClick={onClick}
       className={`flex h-8 min-w-8 items-center justify-center rounded px-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-600 ${
         active ? "bg-blue-100 text-blue-800" : "text-slate-700 hover:bg-slate-100"

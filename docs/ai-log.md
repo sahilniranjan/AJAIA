@@ -125,3 +125,20 @@ Raw notes on how AI (Claude Code) was used while building this. Feeds `AI_WORKFL
 - Outcome: kept. All checks matched the spec on production: session signing, content round-trip, viewer 403, editor edit 200 and delete/share 403, stranger 404 (API and page), tampered cookie 401, share validation messages, role upgrade, revoke, md import and file errors. Test documents were deleted afterwards.
 - Also noted: the signed-out dashboard redirect arrives inside a streamed 200 response (a client redirect plus a meta refresh) rather than an HTTP 307, because `loading.tsx` starts streaming first. It still lands on `/login` in a browser and sends no dashboard data.
 - Verified by: script output. Browser-only behavior (toolbar active states, autosave status, dialog focus, beforeunload) still needs Sahil's manual pass.
+
+### 2026-11-10 02:08 - Full live QA run (API + browser) on production
+- Context: Sahil asked for a full QA pass on https://ajaia-tawny-alpha.vercel.app with "QA TEST" docs only, cleaned up afterwards, and no app code changes.
+- AI proposed: a bash + curl script for the API (44 checks across auth, round-trip, validation, sharing, roles, stranger 404s, revoke, import, delete, cleanup), plus a Playwright script (installed in a scratch folder outside the repo, with Sahil's approval) for the editor, autosave, share dialog, viewer mode, and the 6 screenshots.
+- Outcome: all 44 API checks passed. The browser run first reported 4 failures; all 4 were bugs in my test script, not the app:
+  - Tiptap's `focus()` refocuses the editor one animation frame after a toolbar click (`requestAnimationFrame` in `@tiptap/core`), so Playwright's instant typing landed on the button. Measured: typing at 0 ms was lost, at 20 ms or later it worked. Added a 50 ms pause; toolbar, formatting, and reload checks then passed.
+  - The share dialog's error element is always rendered empty, and my script read it before the server replied. Waiting for the text showed all four inline errors correctly.
+- Findings to decide on (not fixed): the signed-out dashboard shows "Loading your documents..." for about 0.5 s before redirecting to `/login` (HTTP 200 with a client redirect), and toolbar buttons briefly take focus from the editor.
+- Verified by: script output, the screenshots in `docs/screenshots/` (checked by eye), and a cleanup check: Alice's dashboard matches the baseline and Bob's EDITOR share on the welcome doc is intact.
+
+### 2026-11-10 02:14 - Fixed the two live-QA findings
+- Context: Sahil approved fixing both findings from the live QA run.
+- AI proposed:
+  1. Add `src/proxy.ts` (Next 16's name for middleware) matching `/` and `/docs/:path*`. It checks the session cookie's HMAC with the existing `verifySession` and redirects to `/login` before any page streams. I checked the installed Next docs first: proxy defaults to the Node.js runtime in v16, so `node:crypto` works there and the check can verify the signature, not just look for the cookie. Pages and API routes still do the full check (signature plus user exists). Per the Next docs, proxy is an optimistic check, not the authorization layer.
+  2. Add `onMouseDown={(e) => e.preventDefault()}` to the toolbar buttons so focus and the selection never leave the editor.
+- Outcome: kept.
+- Verified by: typecheck, lint, 61 tests, and `next build` (lists `Proxy (Middleware)`). On a local production build: `/` and `/docs/x` with no cookie or a forged cookie return a real 307 to `/login`; signed in, `/` is 200 with the dashboard; `/login` and the API 401 are unchanged. Playwright with no typing delay: focus stays on the editor after clicking Bold, and instant typing is kept and bolded.

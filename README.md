@@ -33,8 +33,8 @@ Sample files to import are in `samples/`.
 Prerequisites: Node 22+, npm, and a Postgres database (a free [Neon](https://neon.tech) project works).
 
 ```bash
-git clone GITHUB_URL_TODO
-cd ajaia-docs
+git clone https://github.com/sahilniranjan/AJAIA.git
+cd AJAIA
 npm install
 cp .env.example .env      # then fill in the three values below
 npm run db:migrate        # creates the tables

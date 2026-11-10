@@ -1,7 +1,7 @@
 # Submission - Ajaia Docs
 
 - **Live app:** LIVE_URL_TODO
-- **Source (GitHub):** GITHUB_URL_TODO
+- **Source (GitHub):** https://github.com/sahilniranjan/AJAIA.git
 - **Google Drive folder:** DRIVE_URL_TODO
 - **Walkthrough video:** VIDEO_URL_TODO (also in `VIDEO_URL.txt`)
 

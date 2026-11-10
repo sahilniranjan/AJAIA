@@ -95,3 +95,12 @@ Raw notes on how AI (Claude Code) was used while building this. Feeds `AI_WORKFL
 - AI proposed: run typecheck, lint, all tests, and `next build` together.
 - Outcome: kept. All clean, 61 tests passing, build succeeds. Fixed one lint warning on the 401 redirect (kept a full reload on purpose so client state from the previous user is cleared).
 - Verified by: command output.
+
+### 2026-11-10 01:30 - Neon setup and real-database QA
+- Context: connecting the app to Sahil's Neon project with the Neon CLI and agent skills.
+- AI proposed: ran `neon init` and `neon deploy`. Neon wrote `DATABASE_URL` (pooled) and `DATABASE_URL_UNPOOLED` (direct) into `.env`, not `.env.local` as expected, because `.env` already existed. Mapped `DIRECT_URL` to the unpooled value without printing it, and let `prisma.config.ts` fall back to `DATABASE_URL_UNPOOLED`. Removed the earlier fallback from the direct URL to the pooled URL, because the Neon skill warns that Prisma Migrate over PgBouncer fails with "prepared statement already exists".
+- Outcome: kept Prisma and `@prisma/adapter-pg`, as CLAUDE.md requires. The Neon postgres skill agrees: pooled for the app, direct for migrations.
+- Why: one env file for Prisma CLI, seed, and Next.js.
+- Verified by: `prisma migrate deploy` applied; the seed ran twice with no duplicates. Then I ran a curl script against `next start` with the real database: login, create, content round-trip, viewer PATCH 403, editor PATCH 200, editor DELETE 403, stranger 404 (API and page), tampered cookie 401, share errors (self, unknown, bad email), role upgrade, revoke, delete, and md import (H1, H2, paragraph, bullet and ordered lists) plus pdf/empty/oversize errors. All matched the spec.
+- Bug found: my first QA script failed every login because zsh does not word-split `$VAR`, so it was rerun under bash. That was a test-script bug, not an app bug.
+- Small fix: invalid content returned zod's default "Invalid input: expected "doc"". Replaced it with "Content must be a document."

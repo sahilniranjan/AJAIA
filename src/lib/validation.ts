@@ -13,7 +13,13 @@ export const titleSchema = z
   .transform((t) => (t === "" ? DEFAULT_TITLE : t));
 
 export const contentSchema = z
-  .looseObject({ type: z.literal("doc"), content: z.array(z.unknown()).optional() })
+  .looseObject(
+    {
+      type: z.literal("doc", { message: "Content must be a document." }),
+      content: z.array(z.unknown()).optional(),
+    },
+    { message: "Content must be a document." },
+  )
   .refine((c) => JSON.stringify(c).length <= MAX_CONTENT_BYTES, {
     message: "Document is too large to save (limit is about 1 MB).",
   });

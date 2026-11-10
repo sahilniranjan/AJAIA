@@ -10,3 +10,4 @@ coverage/
 next-env.d.ts
 src/generated/
 .DS_Store
+.neon

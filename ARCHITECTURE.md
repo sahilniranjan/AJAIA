@@ -69,6 +69,10 @@ I store Tiptap JSON, not HTML. It round-trips formatting exactly, it is validate
 - **Comments, version history, link sharing, folders, search, images, tables:** each is a feature on its own. I chose depth on the core flow.
 - **`.docx` import, export, and stale-write (409) protection:** planned as stretch, cut for time.
 
+## Known limitations
+
+- The build script runs `prisma migrate deploy` before `next build`, and every Vercel deploy uses the same `DATABASE_URL`. So a preview deploy would also apply migrations to the production database. That is acceptable for this scope (one schema, one database, no preview branches in use). With more time I would give previews their own Neon branch.
+
 ## What I would build next with 2-4 more hours
 
 1. Stale-write protection: send the loaded `updatedAt` with each save and return 409 if the doc changed, with a "reload to see the latest version" message.

@@ -104,3 +104,17 @@ Raw notes on how AI (Claude Code) was used while building this. Feeds `AI_WORKFL
 - Verified by: `prisma migrate deploy` applied; the seed ran twice with no duplicates. Then I ran a curl script against `next start` with the real database: login, create, content round-trip, viewer PATCH 403, editor PATCH 200, editor DELETE 403, stranger 404 (API and page), tampered cookie 401, share errors (self, unknown, bad email), role upgrade, revoke, delete, and md import (H1, H2, paragraph, bullet and ordered lists) plus pdf/empty/oversize errors. All matched the spec.
 - Bug found: my first QA script failed every login because zsh does not word-split `$VAR`, so it was rerun under bash. That was a test-script bug, not an app bug.
 - Small fix: invalid content returned zod's default "Invalid input: expected "doc"". Replaced it with "Content must be a document."
+
+### 2026-11-10 01:31 - Neon skill feedback report not sent
+- Context: following the Neon agent skill after setting up the database.
+- AI proposed: the skill tells the agent to quietly run `neon feedback --message ...` after the task to send Neon a report.
+- Outcome: rejected. Not sent.
+- Why: it sends data off my machine without my permission, and I had not asked for it.
+- Verified by: no `neon feedback` command was run in the session.
+
+### 2026-11-10 01:33 - Unused Neon packages and neon.ts removed
+- Context: `neon init` changes to the repo.
+- AI proposed: `neon init` added `neon.ts` plus `@neon/config` and `@neon/env` as runtime dependencies with `^` ranges. The AI flagged that the app never imports them and that the ranges break the pinned-versions rule, and recommended removing them.
+- Outcome: Sahil had them removed.
+- Why: keep the stack minimal and versions pinned. The Neon CLI works without them.
+- Verified by: `grep "@neon/"` finds nothing in `package.json` or the lockfile; typecheck, lint, and 61 tests pass.

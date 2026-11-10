@@ -56,7 +56,7 @@ export function ImportButton() {
   return (
     <div>
       <input
-          id={inputId}
+        id={inputId}
         type="file"
         accept=".txt,.md"
         className="peer sr-only"

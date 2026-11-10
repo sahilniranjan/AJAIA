@@ -44,6 +44,7 @@ No password. Pick a user on the login page.
 - Sharing by email with Viewer and Editor roles, role changes, revoke
 - Owned and shared sections on the dashboard
 - Server-side access checks on every route (404 for no access, 403 for role limits)
+- Signed-out visitors get a real redirect to `/login` from a Next.js proxy (cookie presence and signature check); pages and API routes still do the full session check
 - Deployed on free tiers (Vercel + Neon)
 
 ## What is incomplete

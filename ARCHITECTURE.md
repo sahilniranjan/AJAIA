@@ -33,6 +33,8 @@ All decisions go through `src/lib/access.ts`. `resolveAccess(userId, doc)` is a 
 
 **Auth is mocked, authorization is real.** Login is picking one of three seeded users. The session cookie holds the user id signed with HMAC-SHA256 (`SESSION_SECRET`), is httpOnly, and is verified on every request, so it cannot be edited in the browser to become someone else.
 
+Signed-out visitors are redirected to `/login` by a Next.js proxy (`src/proxy.ts`, matching only `/` and `/docs/*`) before any page renders. It checks that the session cookie is present and correctly signed, but does not touch the database; pages and API routes still run the full check, including that the user exists.
+
 ## Content storage
 
 I store Tiptap JSON, not HTML. It round-trips formatting exactly, it is validated on save (must be `{ type: "doc" }`, under about 1 MB), and rendering it goes through the editor's schema rather than injecting HTML.

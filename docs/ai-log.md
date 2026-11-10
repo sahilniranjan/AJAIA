@@ -142,3 +142,17 @@ Raw notes on how AI (Claude Code) was used while building this. Feeds `AI_WORKFL
   2. Add `onMouseDown={(e) => e.preventDefault()}` to the toolbar buttons so focus and the selection never leave the editor.
 - Outcome: kept.
 - Verified by: typecheck, lint, 61 tests, and `next build` (lists `Proxy (Middleware)`). On a local production build: `/` and `/docs/x` with no cookie or a forged cookie return a real 307 to `/login`; signed in, `/` is 200 with the dashboard; `/login` and the API 401 are unchanged. Playwright with no typing delay: focus stays on the editor after clicking Bold, and instant typing is kept and bolded.
+
+### 2026-11-10 02:20 - proxy.ts added instead of the agreed loading-text change
+- Context: fixing the live-QA finding that signed-out visitors briefly saw "Loading your documents..." before the redirect.
+- AI proposed: Sahil had decided to only change the loading text. In chat, the AI had suggested `src/proxy.ts` as the fix. When Sahil replied "both" to "fix bug 1 and/or bug 2", the AI took that as approval of `proxy.ts` and did not confirm the approach before building it.
+- Outcome: changed, then accepted. Sahil kept `proxy.ts` after it passed the local and live checks.
+- Why: it works and gives a real 307. But it was a decision the AI should have confirmed, not assumed. Lesson: when a short reply could approve either the problem or the specific fix, ask which.
+- Verified by: live checks (no cookie and forged cookie get 307 to `/login`; signed in gets 200 with the dashboard; `/login` and the API are unchanged).
+
+### 2026-11-10 02:22 - Root loading.tsx was also wrapping /login
+- Context: after the proxy fix, the live browser test still saw "Loading your documents..." on signed-out visits.
+- AI proposed: the cause was `src/app/loading.tsx` sitting at the top of `src/app/`, so it wrapped every route, including `/login`. Moved the dashboard `page.tsx` and `loading.tsx` into a route group, `src/app/(dashboard)/`. The URL stays `/` and the loading screen now only wraps the dashboard.
+- Outcome: kept, with Sahil's approval.
+- Why: a pre-existing scoping bug that the proxy fix made visible.
+- Verified by: local production build and the live URL (see the next entry for results).

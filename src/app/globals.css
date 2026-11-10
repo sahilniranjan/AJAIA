@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+}
+
+/* Editor content styles: Tailwind resets headings and lists, so restore them inside the editor. */
+.prose-editor h1 { @apply text-3xl font-bold mt-6 mb-3; }
+.prose-editor h2 { @apply text-2xl font-semibold mt-5 mb-2; }
+.prose-editor p { @apply my-2 leading-7; }
+.prose-editor ul { @apply list-disc pl-6 my-2; }
+.prose-editor ol { @apply list-decimal pl-6 my-2; }
+.prose-editor li p { @apply my-0; }
+.prose-editor:focus { outline: none; }
+.prose-editor p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  @apply text-slate-400 float-left h-0 pointer-events-none;
+}

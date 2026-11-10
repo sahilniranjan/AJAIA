@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String          @id @default(cuid())
+  email     String          @unique
+  name      String
+  documents Document[]      @relation("OwnedDocuments")
+  shares    DocumentShare[]
+  createdAt DateTime        @default(now())
+}
+
+model Document {
+  id        String          @id @default(cuid())
+  title     String          @default("Untitled document")
+  content   Json
+  ownerId   String
+  owner     User            @relation("OwnedDocuments", fields: [ownerId], references: [id], onDelete: Cascade)
+  shares    DocumentShare[]
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  @@index([ownerId])
+}
+
+model DocumentShare {
+  documentId String
+  userId     String
+  role       ShareRole
+  document   Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime  @default(now())
+
+  @@id([documentId, userId])
+  @@index([userId])
+}
+
+enum ShareRole {
+  VIEWER
+  EDITOR
+}

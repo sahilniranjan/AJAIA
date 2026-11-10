@@ -2,7 +2,7 @@
 
 A lightweight document editor inspired by Google Docs. You can create and format documents, import `.txt` and `.md` files, and share documents with other users as a Viewer or Editor.
 
-**Live app:** LIVE_URL_TODO
+**Live app:** https://ajaia-tawny-alpha.vercel.app/
 
 ## Demo accounts
 
